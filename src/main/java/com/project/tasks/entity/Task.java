@@ -10,7 +10,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @Entity
 @ToString
-public class TaskEntity {
+public class Task {
 
     @Id
     @Generated
