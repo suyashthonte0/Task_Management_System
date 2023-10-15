@@ -2,8 +2,7 @@ package com.project.tasks.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -13,9 +12,16 @@ import javax.persistence.Id;
 public class Task {
 
     @Id
-    @Generated
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String title;
     private String description;
-    private boolean completed;
+    private Boolean completed;
+
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
+
+    public enum Priority {
+        LOW, MEDIUM, HIGH
+    }
 }

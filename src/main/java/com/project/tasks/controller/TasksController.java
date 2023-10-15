@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @CrossOrigin
@@ -17,27 +18,27 @@ public class TasksController {
     private TaskService taskService;
 
     @PostMapping()
-    public Task saveTask(@RequestBody Task task){
+    public Task saveTask(@RequestBody Task task) {
         return taskService.saveTask(task);
     }
 
     @GetMapping()
-    public List<Task> retrieveTasks(){
-        return taskService.retrieveTasks(task);
+    public List<Task> retrieveTasks() {
+        return taskService.retrieveTasks();
     }
 
     @GetMapping("/{taskId}")
-    public List<Task> retrieveTasks(@PathVariable String taskId){
-        return taskService.retrieveTasks(taskId);
+    public Task retrieveTask(@PathVariable String taskId) {
+        return taskService.retrieveTask(taskId);
     }
 
     @PutMapping("/{taskId}")
-    public Task updateTask(@PathVariable String taskId){
-        return taskService.updateTask(task);
+    public Task updateTask(@PathVariable String taskId, @RequestBody Task task) {
+        return taskService.updateTask(taskId, task);
     }
 
-    @DeleteMapping("/deleteTask")
-    public Task deleteTask(@RequestBody Task task){
-        return taskService.deleteTask(task);
+    @DeleteMapping("/{taskId}")
+    public String deleteTask(@PathVariable String taskId) {
+        return taskService.deleteTask(taskId);
     }
 }
