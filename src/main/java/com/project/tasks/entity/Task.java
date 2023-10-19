@@ -1,6 +1,9 @@
 package com.project.tasks.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -15,9 +18,12 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String title;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private Boolean completed;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
