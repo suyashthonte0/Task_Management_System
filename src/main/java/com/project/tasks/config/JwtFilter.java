@@ -1,47 +1,47 @@
 package com.project.tasks.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.filter.GenericFilterBean;
+import com.project.tasks.entity.CustomUserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JwtFilter extends GenericFilterBean {
-    @Value("${jwt.secret}")
-    private String secret;
+@Component
+public class JwtFilter extends OncePerRequestFilter {
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public JwtFilter(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletResponse response = null;
-        try {
-            final HttpServletRequest request = (HttpServletRequest) servletRequest;
-            response = (HttpServletResponse) servletResponse;
-            final String authHeader = request.getHeader("authorization");
-            if ("OPTIONS".equals(request.getMethod())) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                filterChain.doFilter(request, response);
-            } else {
-                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                    throw new ServletException("An exception occurred");
-                }
-            }
-            final String token = authHeader.substring(7);
-            Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-            String role = (String) claims.get("role");
-            request.setAttribute("role", role);
-            request.setAttribute("claims", claims);
-            request.setAttribute("blog", servletRequest.getParameter("id"));
-            filterChain.doFilter(request, response);
-        } catch (Exception ex) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: " + ex.getMessage());
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String token = extractToken(request);
+
+        if (token != null) {
+            String role = jwtTokenProvider.extractUserRole(token);
+            String username = jwtTokenProvider.getUsernameFromToken(token);
+
+            CustomUserDetails customUserDetails = new CustomUserDetails(username, role);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+        filterChain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 }

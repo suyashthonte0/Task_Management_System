@@ -1,5 +1,7 @@
 package com.project.tasks.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.project.tasks.util.TaskSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @ToString
+@JsonSerialize(using = TaskSerializer.class)
 public class Task {
 
     @Id

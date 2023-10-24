@@ -3,6 +3,7 @@ package com.project.tasks.controller;
 import com.project.tasks.entity.Task;
 import com.project.tasks.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/tasks")
+@Slf4j
 public class TasksController {
 
     @Autowired
